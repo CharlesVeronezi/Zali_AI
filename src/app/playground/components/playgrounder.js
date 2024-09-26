@@ -9,23 +9,29 @@ export function Playgrounder() {
   const [selectedImage, setSelectedImage] = React.useState(null);
 
   const ImageRemoveBackground = async () => {
-    const formData = new FormData();
-    formData.append("image", selectedImage);
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append("image", selectedImage);
 
-    try {
-      const response = await axios({
-        url: "/api/image/remove_background",
-        method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        data: formData,
-      });
-      if (response.status == 200) {
-        SuccessAlert("Fundo removido com sucesso");
+      try {
+        const response = await axios({
+          url: "/api/image/remove_background",
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          responseType: "blob",
+          data: formData,
+        });
+        if (response.status == 200) {
+          SuccessAlert("Fundo removido com sucesso");
+          setSelectedImage(response.data);
+        }
+      } catch (error) {
+        ErrorAlert("Erro ao remover o fundo da imagem");
       }
-    } catch (error) {
-      ErrorAlert("Erro ao remover o fundo da imagem");
+    } else {
+      ErrorAlert("Nenhuma imagem selecionada");
     }
   };
 
@@ -53,8 +59,13 @@ export function Playgrounder() {
                 Gerar Imagem
               </button>
               <button
-                className="px-4 py-2 border border-slate-800 bg-slate-200 text-slate-800 rounded-xl min-w-full sm:min-w-40 font-semibold hover:bg-slate-100"
+                className={`px-4 py-2 border border-slate-800 bg-slate-200 text-slate-800 rounded-xl min-w-full sm:min-w-40 font-semibold ${
+                  !selectedImage
+                    ? "cursor-not-allowed"
+                    : "cursor-pointer hover:bg-slate-100"
+                } `}
                 onClick={ImageRemoveBackground}
+                disabled={!selectedImage}
               >
                 Remover Fundo
               </button>
