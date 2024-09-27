@@ -37,12 +37,14 @@ export default async function handler(req, res) {
           Authorization: `Bearer ${process.env.STABILITY_API_KEY}`,
           Accept: "image/*",
         },
+        responseType: "arraybuffer", // Alterado para arraybuffer
       }
     );
 
     if (response.status === 200) {
-      res.setHeader("Content-Type", "image/png");
-      return res.send(Buffer.from(response.data));
+      // Converter para base64
+      const base64Image = Buffer.from(response.data, "binary").toString("base64");
+      return res.status(200).json({ image: `data:image/png;base64,${base64Image}` });
     } else {
       return res
         .status(response.status)
@@ -51,6 +53,6 @@ export default async function handler(req, res) {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: `Erro ao comunicar com a API. ${error.response.data}` });
+      .json({ error: `Erro ao comunicar com a API. ${error.message}` });
   }
 }

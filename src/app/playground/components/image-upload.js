@@ -44,14 +44,21 @@ function ImageUpload({ selectedImage, setSelectedImage }) {
     fileInputRef.current.click();
   };
 
+  useEffect(() => {
+    return () => {
+      if (selectedImage instanceof File) {
+        URL.revokeObjectURL(URL.createObjectURL(selectedImage));
+      }
+    };
+  }, [selectedImage]);
+
   return (
     <div
       className={`relative flex items-center justify-center md:w-[500px] md:h-[400px] max-w-sm rounded-lg cursor-pointer 
-                 ${
-                   !selectedImage
-                     ? "p-8 border-dashed border-2 border-slate-600 bg-slate-100"
-                     : ""
-                 } 
+                 ${!selectedImage
+          ? "p-8 border-dashed border-2 border-slate-600 bg-slate-100"
+          : ""
+        } 
               `}
       onClick={handleButtonClick}
       onDragOver={handleDragOver}
@@ -66,7 +73,7 @@ function ImageUpload({ selectedImage, setSelectedImage }) {
       />
       {selectedImage ? (
         <img
-          src={URL.createObjectURL(selectedImage)}
+          src={selectedImage instanceof File ? URL.createObjectURL(selectedImage) : selectedImage}
           alt="Imagem selecionada"
           className="w-full h-full object-contain"
         />
